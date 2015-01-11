@@ -1,0 +1,50 @@
+# Quelques experiences sur le format OSM :
+# - rasteriser
+# - afficher en 3D OpenGL
+#
+# Rasteriser des cartes OSM
+# cf http://wiki.openstreetmap.org/wiki/Osmarender/Howto#Requirements
+#
+#  OSM -XSLT-> SVG -raster-> JPG,OpenGL
+#
+# XML / XSLT :
+#   http://xmlsoft.org/
+#   http://xmlsoft.org/XSLT/tutorial/libxslttutorial.html
+#
+# SVG :
+#  Qt : QSvgRenderer peut ecrire dans un QGLWidget (2D ?)
+#       restreint a "SVG 1.2 Tiny"
+#
+# /c/GIS/rhones-alpes.osm : (2.4Go)
+# - est trop gros pour osmarender au LOD 10
+# - des "relation" ont des membres de type "relation" (seul element arborescent de l'OSM)
+# - Emploi de <bound ...> pour restreindre a (0.01°)^2 dans osmarender.../essai.xml : tjrs memory error ...
+#   sans doute car le parser XML charge d'abord tout en RAM avant de trier sur bound dans le DOM
+# - Maperitive charge 10M-node puis fait out of memory (1.6G) apres 780k-way
+#
+# /c/GIS/Aravis.osm : (7.6Mo)
+# - passe dans osmarender, mais ca rame pathetiquement
+# - Taille du SVG produit : LOD10..14=4.4Mo
+#   Il n'existe pas de version "dezoomee" des way : la taille du SVG produit ne depend guere du LoD.
+#   Le bound doit etre adapte au LoD, mais pourquoi un SVG de LoD faible resterait-il de taille raisonnable ?
+#
+# tinyxml : petite bib C++ de lecture de XML
+# - sans verif ni XSL, traite UTF-8
+# - construit un DOM, pas de handler pour "compiler" a la volee
+# - Ne parse en fait que des string : le fichier est lu en une fois en une unique string
+#
+
+
+OSMAR=/c/Source/osmarender-trunk
+
+map=ra
+#cp $map.osm $OSMAR/stylesheets/data.osm
+
+(cd $OSMAR; ./xml.exe tr \
+  xslt/osmarender.xsl \
+  stylesheets/osm-map-features-z15.xml \
+  )
+
+# stylesheets/essai.xml \
+
+
