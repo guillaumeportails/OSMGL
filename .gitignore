@@ -49,3 +49,5 @@ Temporary Items
 *.svg
 *.zip
 *.pdf
+data.osm
+lampes.osm
